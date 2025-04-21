@@ -4,7 +4,21 @@ import { v2 as cloudinary } from 'cloudinary';
 // สำหรับ admin เพิ่มสินค้า
 const addProduct = async (req, res) => {
   try {
-    const { name, description, price, category, bestseller } = req.body;
+    const { name, description, specs, price, category, bestseller } = req.body;
+
+    // ตรวจสอบจำนวนสินค้า bestseller
+    if (bestseller) {
+      const bestsellerCount = await productModel.countDocuments({
+        bestseller: true,
+      });
+
+      if (bestsellerCount > 8) {
+        return res.json({
+          success: false,
+          message: 'Cannot add more bestseller products. Limit is 8.',
+        });
+      }
+    }
 
     const image1 = req.files.image1 && req.files.image1[0];
     const image2 = req.files.image2 && req.files.image2[0];
@@ -25,9 +39,15 @@ const addProduct = async (req, res) => {
       })
     );
 
+    const specsArray =
+      typeof specs === 'string'
+        ? specs.split('\n').map((item) => item.trim())
+        : [];
+
     const productData = {
       name,
       description,
+      specs: specsArray,
       price,
       images: imagesUrl,
       category,
@@ -46,7 +66,7 @@ const addProduct = async (req, res) => {
   }
 };
 
-// function for list product
+// รายการสินค้า
 const listProduct = async (req, res) => {
   try {
     const products = await productModel.find({});
@@ -57,4 +77,100 @@ const listProduct = async (req, res) => {
   }
 };
 
-export { listProduct, addProduct };
+// Add Bestseller
+const addBestSeller = async (req, res) => {
+  const { _id } = req.params;
+  const { bestseller } = req.body;
+  try {
+    // ตรวจสอบจำนวนสินค้า bestseller
+    if (bestseller === true) {
+      const bestsellerCount = await productModel.countDocuments({
+        bestseller: true,
+      });
+
+      if (bestsellerCount >= 8) {
+        return res.status(400).json({
+          success: false,
+          message: 'Cannot add more bestseller products. Limit is 8.',
+        });
+      }
+    }
+    const product = await productModel.findByIdAndUpdate(
+      _id,
+      { bestseller },
+      { new: true }
+    );
+
+    if (!product) {
+      return res.status(404).json({ message: 'ไม่พบสินค้า' });
+    }
+
+    res.status(200).json(product);
+  } catch (err) {
+    console.log(err);
+    res.json({ success: false, message: err.message });
+  }
+};
+
+// ฟังก์ชั่นแก้ไขข้อมูลสินค้า
+const UpdateProductInfo = async (req, res) => {
+  const { _id } = req.params;
+  const { name, description, specs, category, price } = req.body;
+  try {
+    const product = await productModel.findByIdAndUpdate(
+      _id,
+      { name, description, specs, category, price },
+      { new: true }
+    );
+
+    if (!product) {
+      return res.status(404).json({ message: 'ไม่พบสินค้า' });
+    }
+
+    res.status(200).json(product);
+  } catch (err) {
+    console.log(err);
+    res.json({ success: false, message: err.message });
+  }
+};
+
+// Remove Bestseller
+const removeBestSeller = async (req, res) => {
+  const { _id } = req.params;
+  try {
+    const product = await productModel.findByIdAndUpdate(
+      _id,
+      { bestseller: false },
+      { new: true }
+    );
+
+    if (!product) {
+      return res.status(404).json({ message: 'ไม่พบสินค้า' });
+    }
+
+    res.status(200).json(product);
+  } catch (err) {
+    console.log(err);
+    res.json({ success: false, message: err.message });
+  }
+};
+
+// ลบสินค้า
+const removeProduct = async (req, res) => {
+  try {
+    await productModel.findByIdAndDelete(req.params._id);
+    res.json({ message: 'Product deleted' });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+export {
+  listProduct,
+  addProduct,
+  removeProduct,
+  addBestSeller,
+  removeBestSeller,
+  UpdateProductInfo,
+};

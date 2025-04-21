@@ -5,11 +5,12 @@ import connectDB from './Config/mongodb.js';
 import productRouter from './Routes/productRoute.js';
 import dotenv from 'dotenv';
 import connecntCloudinary from './Config/cloudinary.js';
+import userRouter from './Routes/userRoute.js';
 
 dotenv.config();
 
 const app = express();
-const port = 5000;
+const port = process.env.PORT || 5000;
 
 // Service connections
 connectDB();
@@ -21,6 +22,7 @@ app.use(express.json());
 app.use(cors());
 
 app.use('/api', productRouter);
+app.use('/api', userRouter);
 
 // app.use('/', (req, res) => {
 //   res.send('API WORKING !!!');
