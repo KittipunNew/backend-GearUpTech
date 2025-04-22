@@ -77,7 +77,7 @@ const listProduct = async (req, res) => {
   }
 };
 
-// Add Bestseller
+// ฟังก์ชั่นเพิ่ม สินค้าขายดี
 const addBestSeller = async (req, res) => {
   const { _id } = req.params;
   const { bestseller } = req.body;
@@ -88,6 +88,7 @@ const addBestSeller = async (req, res) => {
         bestseller: true,
       });
 
+      // จำกัดให้รายการ สินค้าขายดี สูงสุด 8 รายการ
       if (bestsellerCount >= 8) {
         return res.status(400).json({
           success: false,
@@ -102,7 +103,7 @@ const addBestSeller = async (req, res) => {
     );
 
     if (!product) {
-      return res.status(404).json({ message: 'ไม่พบสินค้า' });
+      return res.status(404).json({ message: 'No products found' });
     }
 
     res.status(200).json(product);
@@ -124,7 +125,7 @@ const UpdateProductInfo = async (req, res) => {
     );
 
     if (!product) {
-      return res.status(404).json({ message: 'ไม่พบสินค้า' });
+      return res.status(404).json({ message: 'No products found' });
     }
 
     res.status(200).json(product);
@@ -134,7 +135,7 @@ const UpdateProductInfo = async (req, res) => {
   }
 };
 
-// Remove Bestseller
+// ลบรายการสินค้าขายดี
 const removeBestSeller = async (req, res) => {
   const { _id } = req.params;
   try {
@@ -145,7 +146,7 @@ const removeBestSeller = async (req, res) => {
     );
 
     if (!product) {
-      return res.status(404).json({ message: 'ไม่พบสินค้า' });
+      return res.status(404).json({ message: 'No products found' });
     }
 
     res.status(200).json(product);
@@ -155,7 +156,7 @@ const removeBestSeller = async (req, res) => {
   }
 };
 
-// ลบสินค้า
+// ลบข้อมูลสินค้า
 const removeProduct = async (req, res) => {
   try {
     await productModel.findByIdAndDelete(req.params._id);

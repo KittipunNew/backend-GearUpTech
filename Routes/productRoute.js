@@ -8,15 +8,16 @@ import {
   UpdateProductInfo,
 } from '../Controllers/productController.js';
 import upload from '../Config/multer.js';
-import adminAuth from '../Middleware/adminAuth.js';
+import requireRole from '../Middleware/auth.js';
 
 const productRouter = express.Router();
 
-productRouter.get('/product', listProduct);
+productRouter.get('/product', listProduct); // รายการสินค้าทั้งหมด
 
+// เพิ่มรายการสินค้า
 productRouter.post(
   '/product',
-  adminAuth,
+  requireRole(['superadmin', 'staff']),
   upload.fields([
     { name: 'image1', maxCount: 1 },
     { name: 'image2', maxCount: 1 },
@@ -26,11 +27,32 @@ productRouter.post(
   addProduct
 );
 
-productRouter.put('/product/:_id/updateproduct', adminAuth, UpdateProductInfo);
-productRouter.put('/product/:_id/bestseller', adminAuth, addBestSeller);
+// อัพเดทสินค้า
+productRouter.put(
+  '/product/:_id/updateproduct',
+  requireRole(['superadmin', 'staff']),
+  UpdateProductInfo
+);
 
-productRouter.delete('/product/:_id/bestseller', adminAuth, removeBestSeller);
+// เพิ่มรายการสินค้าขายดี
+productRouter.put(
+  '/product/:_id/bestseller',
+  requireRole(['superadmin', 'staff']),
+  addBestSeller
+);
 
-productRouter.delete('/product/:_id', adminAuth, removeProduct);
+// ลบออกรายการสินค้าขายดี
+productRouter.delete(
+  '/product/:_id/bestseller',
+  requireRole(['superadmin', 'staff']),
+  removeBestSeller
+);
+
+// ลบข้อมูลสินค้า
+productRouter.delete(
+  '/product/:_id',
+  requireRole(['superadmin']),
+  removeProduct
+);
 
 export default productRouter;
