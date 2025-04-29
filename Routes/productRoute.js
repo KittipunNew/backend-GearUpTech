@@ -8,7 +8,7 @@ import {
   UpdateProductInfo,
 } from '../Controllers/productController.js';
 import upload from '../Config/multer.js';
-import requireRole from '../Middleware/auth.js';
+import { verifyFirebaseToken } from '../Middleware/firebaseAdmin.js';
 
 const productRouter = express.Router();
 
@@ -17,7 +17,7 @@ productRouter.get('/product', listProduct); // รายการสินค้
 // เพิ่มรายการสินค้า
 productRouter.post(
   '/product',
-  requireRole(['superadmin', 'staff']),
+  verifyFirebaseToken,
   upload.fields([
     { name: 'image1', maxCount: 1 },
     { name: 'image2', maxCount: 1 },
@@ -30,29 +30,25 @@ productRouter.post(
 // อัพเดทสินค้า
 productRouter.put(
   '/product/:_id/updateproduct',
-  requireRole(['superadmin', 'staff']),
+  verifyFirebaseToken,
   UpdateProductInfo
 );
 
 // เพิ่มรายการสินค้าขายดี
 productRouter.put(
   '/product/:_id/bestseller',
-  requireRole(['superadmin', 'staff']),
+  verifyFirebaseToken,
   addBestSeller
 );
 
 // ลบออกรายการสินค้าขายดี
 productRouter.delete(
   '/product/:_id/bestseller',
-  requireRole(['superadmin', 'staff']),
+  verifyFirebaseToken,
   removeBestSeller
 );
 
 // ลบข้อมูลสินค้า
-productRouter.delete(
-  '/product/:_id',
-  requireRole(['superadmin']),
-  removeProduct
-);
+productRouter.delete('/product/:_id', verifyFirebaseToken, removeProduct);
 
 export default productRouter;

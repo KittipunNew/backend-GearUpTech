@@ -1,4 +1,5 @@
 .env
 .gitignore
 
-seedAdmin.js
+firebase-service-account.json
+setAdmin.js
