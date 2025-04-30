@@ -18,7 +18,7 @@ const userSchema = new mongoose.Schema(
         },
         quantity: { type: Number, required: true, default: 1 },
       },
-    ],
+    ], // ตะกร้าสินค้าของผู้ใช้
     wishlist: [
       {
         productId: {
@@ -28,7 +28,30 @@ const userSchema = new mongoose.Schema(
         },
         addedAt: { type: Date, default: Date.now },
       },
-    ],
+    ], // รายการสินค้าที่ผู้ใช้สนใจ
+    orders: [
+      {
+        orderId: { type: String, required: true },
+        products: [
+          {
+            productId: {
+              type: mongoose.Schema.Types.ObjectId,
+              ref: 'products',
+              required: true,
+            },
+            quantity: { type: Number, required: true },
+            price: { type: Number, required: true },
+          },
+        ], // รายการสินค้าที่สั่งซื้อ
+        totalAmount: { type: Number, required: true }, // ราคารวม
+        orderStatus: {
+          type: String,
+          enum: ['pending', 'processing', 'shipped', 'delivered', 'cancelled'],
+          default: 'pending',
+        }, // สถานะคำสั่งซื้อ
+        orderedAt: { type: Date, default: Date.now }, // วันที่สั่งซื้อ
+      },
+    ], // คำสั่งซื้อของผู้ใช้
   },
   { timestamps: true }
 );

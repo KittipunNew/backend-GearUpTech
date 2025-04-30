@@ -29,7 +29,7 @@ const register = async (req, res) => {
   }
 };
 
-// ฟังก์ชั่นดึงข้อมูล user
+// ดึงข้อมูลผู้ใช้
 const getUserById = async (req, res) => {
   const { uid } = req.params;
   try {
@@ -40,9 +40,40 @@ const getUserById = async (req, res) => {
     } else {
       res.status(404).json({ message: 'User not found' });
     }
-  } catch (error) {
-    res.status(500).json({ message: 'Error fetching user', error });
+  } catch (err) {
+    res.status(500).json({ message: 'Error fetching user', err });
   }
 };
 
-export { register, getUserById };
+// อัพเดทข้อมูลผู้ใช้
+const updateUserInfo = async (req, res) => {
+  const { uid } = req.params;
+  try {
+    const { firstName, lastName, phoneNumber, dateOfBirth } = req.body;
+
+    if (!uid) {
+      return res.status(400).json({
+        error: 'UID is required to update user information.',
+      });
+    }
+
+    const updatedUser = await userModel.findOneAndUpdate(
+      { uid: uid },
+      { $set: { firstName, lastName, phoneNumber, dateOfBirth } },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ error: 'User not found.' });
+    }
+
+    res.status(200).json({
+      message: 'User information updated successfully.',
+      user: updatedUser,
+    });
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+export { register, getUserById, updateUserInfo };
