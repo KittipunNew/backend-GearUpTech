@@ -3,7 +3,15 @@ import userModel from '../Models/userModel.js';
 // สมัครสมาชิก
 const register = async (req, res) => {
   try {
-    const { uid, email, firstName, lastName, phoneNumber, address } = req.body;
+    const {
+      uid,
+      email,
+      firstName,
+      lastName,
+      phoneNumber,
+      address,
+      dateOfBirth,
+    } = req.body;
     const newUser = new userModel({
       uid,
       email,
@@ -11,6 +19,7 @@ const register = async (req, res) => {
       lastName,
       phoneNumber,
       address,
+      dateOfBirth,
     });
     await newUser.save();
     res.status(201).send('User created successfully');
