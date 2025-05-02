@@ -76,4 +76,41 @@ const updateUserInfo = async (req, res) => {
   }
 };
 
-export { register, getUserById, updateUserInfo };
+const createAddress = async (req, res) => {
+  try {
+    if (!req.user || !req.user.uid) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
+
+    const { address } = req.body;
+
+    const uid = req.user?.uid; // ป้องกัน undefined
+
+    const user = await userModel.findOne({ uid });
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // ตรวจสอบข้อมูล address ก่อนเพิ่ม
+    if (
+      !address ||
+      !address.addressType ||
+      !address.addressDetails ||
+      !address.postCode
+    ) {
+      return res.status(400).json({ message: 'Invalid address data' });
+    }
+
+    user.address.push(address); // เพิ่มที่อยู่ใหม่เข้าไปใน array
+    await user.save();
+
+    res
+      .status(200)
+      .json({ message: 'Address added successfully', address: user.address });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err });
+  }
+};
+
+export { register, getUserById, updateUserInfo, createAddress };

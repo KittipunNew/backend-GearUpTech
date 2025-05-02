@@ -14,7 +14,7 @@ const productRouter = express.Router();
 
 productRouter.get('/product', listProduct); // รายการสินค้าทั้งหมด
 
-// เพิ่มรายการสินค้า
+// เพิ่มรายการสินค้า *admin
 productRouter.post(
   '/product',
   verifyFirebaseToken,
@@ -27,28 +27,28 @@ productRouter.post(
   addProduct
 );
 
-// อัพเดทสินค้า
+// อัพเดทสินค้า *admin
 productRouter.put(
   '/product/:_id/updateproduct',
   verifyFirebaseToken,
   UpdateProductInfo
 );
 
-// เพิ่มรายการสินค้าขายดี
+// เพิ่มรายการสินค้าขายดี *admin
 productRouter.put(
   '/product/:_id/bestseller',
   verifyFirebaseToken,
   addBestSeller
 );
 
-// ลบออกรายการสินค้าขายดี
+// ลบออกรายการสินค้าขายดี *admin
 productRouter.delete(
   '/product/:_id/bestseller',
   verifyFirebaseToken,
   removeBestSeller
 );
 
-// ลบข้อมูลสินค้า
+// ลบข้อมูลสินค้า *admin
 productRouter.delete('/product/:_id', verifyFirebaseToken, removeProduct);
 
 export default productRouter;

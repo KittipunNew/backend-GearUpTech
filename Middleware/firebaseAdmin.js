@@ -11,7 +11,6 @@ admin.initializeApp({
 
 export const verifyFirebaseToken = async (req, res, next) => {
   const token = req.headers.authorization?.split(' ')[1];
-  console.log('🔥 Incoming token:', token);
   try {
     const decodedToken = await admin.auth().verifyIdToken(token);
     req.user = decodedToken;
