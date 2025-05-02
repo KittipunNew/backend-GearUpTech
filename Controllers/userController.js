@@ -47,18 +47,17 @@ const getUserById = async (req, res) => {
 
 // อัพเดทข้อมูลผู้ใช้
 const updateUserInfo = async (req, res) => {
-  const { uid } = req.params;
   try {
-    const { firstName, lastName, phoneNumber, dateOfBirth } = req.body;
-
-    if (!uid) {
-      return res.status(400).json({
-        error: 'UID is required to update user information.',
-      });
+    if (!req.user || !req.user.uid) {
+      return res.status(401).json({ message: 'Unauthorized' });
     }
 
+    const { firstName, lastName, phoneNumber, dateOfBirth } = req.body;
+
+    const uid = req.user?.uid; // ป้องกัน undefined
+
     const updatedUser = await userModel.findOneAndUpdate(
-      { uid: uid },
+      { uid },
       { $set: { firstName, lastName, phoneNumber, dateOfBirth } },
       { new: true, runValidators: true }
     );

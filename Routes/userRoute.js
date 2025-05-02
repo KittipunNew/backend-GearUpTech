@@ -16,7 +16,7 @@ userRouter.get('/users/:uid', verifyFirebaseToken, getUserById);
 userRouter.post('/register', register);
 
 // อัพเดทข้อมูลผู้ใช้
-userRouter.put('/update-info/:uid', verifyFirebaseToken, updateUserInfo);
+userRouter.put('/update-info', verifyFirebaseToken, updateUserInfo);
 
 userRouter.post('/create-address', verifyFirebaseToken, createAddress);
 
