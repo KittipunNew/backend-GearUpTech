@@ -4,6 +4,8 @@ import {
   getUserById,
   updateUserInfo,
   createAddress,
+  updateUserAddress,
+  deleteUserAddress,
 } from '../Controllers/userController.js';
 import { verifyFirebaseToken } from '../Middleware/firebaseAdmin.js';
 
@@ -20,5 +22,17 @@ userRouter.put('/update-info', verifyFirebaseToken, updateUserInfo);
 
 // เพิ่มที่อยู่
 userRouter.post('/create-address', verifyFirebaseToken, createAddress);
+
+userRouter.put(
+  '/update-address/:addressId',
+  verifyFirebaseToken,
+  updateUserAddress
+);
+
+userRouter.delete(
+  '/delete-address/:addressId',
+  verifyFirebaseToken,
+  deleteUserAddress
+);
 
 export default userRouter;

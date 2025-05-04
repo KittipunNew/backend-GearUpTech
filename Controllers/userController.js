@@ -80,6 +80,7 @@ const updateUserInfo = async (req, res) => {
   }
 };
 
+// เพิ่มที่อยู่ผู้ใช้
 const createAddress = async (req, res) => {
   try {
     if (!req.user || !req.user.uid) {
@@ -117,4 +118,96 @@ const createAddress = async (req, res) => {
   }
 };
 
-export { register, getUserById, updateUserInfo, createAddress };
+// อัพเดทที่อยู่ผู้ใช้
+const updateUserAddress = async (req, res) => {
+  const { addressId } = req.params;
+
+  const {
+    firstName,
+    lastName,
+    phoneNumber,
+    addressType,
+    addressDetails,
+    postCode,
+  } = req.body;
+
+  try {
+    if (!req.user || !req.user.uid) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
+
+    const uid = req.user?.uid;
+
+    const user = await userModel.findOneAndUpdate({ uid });
+
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    const address = user.address.id(addressId);
+
+    if (!address)
+      return res
+        .status(404)
+        .json({ message: 'Address not found with that ID' });
+
+    address.firstName = firstName;
+    address.lastName = lastName;
+    address.phoneNumber = phoneNumber;
+    address.addressType = addressType;
+    address.addressDetails = addressDetails;
+    address.postCode = postCode;
+
+    await user.save();
+
+    res.json({ message: 'Address updated successfully', user });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// ลบที่อยู่ผู้ใช้
+const deleteUserAddress = async (req, res) => {
+  const { addressId } = req.params;
+
+  try {
+    const uid = req.user?.uid;
+
+    const user = await userModel.findOne({ uid });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const address = user.address.id(addressId);
+
+    if (!address)
+      return res
+        .status(404)
+        .json({ message: 'Address not found with that ID' });
+
+    const addressIndex = user.address.findIndex(
+      (index) => index._id.toString() === addressId
+    );
+    if (addressIndex === -1) {
+      return res
+        .status(404)
+        .json({ message: 'Address not found with that ID' });
+    }
+
+    user.address.splice(addressIndex, 1);
+
+    await user.save();
+
+    return res.status(200).json({ message: 'Address deleted successfully' });
+  } catch (error) {
+    console.error('Error in deleteUserAddress:', error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export {
+  register,
+  getUserById,
+  updateUserInfo,
+  createAddress,
+  updateUserAddress,
+  deleteUserAddress,
+};
