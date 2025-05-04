@@ -31,9 +31,14 @@ const register = async (req, res) => {
 
 // ดึงข้อมูลผู้ใช้
 const getUserById = async (req, res) => {
-  const { uid } = req.params;
   try {
-    const user = await userModel.findOne({ uid: uid });
+    if (!req.user || !req.user.uid) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
+
+    const uid = req.user?.uid;
+
+    const user = await userModel.findOne({ uid });
 
     if (user) {
       res.json(user);

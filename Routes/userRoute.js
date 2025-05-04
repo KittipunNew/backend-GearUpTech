@@ -10,7 +10,7 @@ import { verifyFirebaseToken } from '../Middleware/firebaseAdmin.js';
 const userRouter = express.Router();
 
 // ข้อมูลผู้ใช้
-userRouter.get('/users/:uid', verifyFirebaseToken, getUserById);
+userRouter.get('/users', verifyFirebaseToken, getUserById);
 
 // สมัครสมาชิก
 userRouter.post('/register', register);
@@ -18,6 +18,7 @@ userRouter.post('/register', register);
 // อัพเดทข้อมูลผู้ใช้
 userRouter.put('/update-info', verifyFirebaseToken, updateUserInfo);
 
+// เพิ่มที่อยู่
 userRouter.post('/create-address', verifyFirebaseToken, createAddress);
 
 export default userRouter;
