@@ -38,7 +38,6 @@ const addWishlist = async (req, res) => {
 
 const deleteWishlist = async (req, res) => {
   const { userId, productId } = req.body;
-  console.log(userId + productId);
   try {
     await wishlistModel.findOneAndDelete({
       userId,

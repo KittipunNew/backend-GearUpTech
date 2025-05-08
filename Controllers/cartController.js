@@ -6,7 +6,7 @@ const getCartList = async (req, res) => {
   console.log(req.params);
   try {
     const cartList = await cartModel
-      .find({ userId })
+      .findOne({ userId })
       .populate('items.productId', 'name price images');
     res.status(200).json(cartList);
   } catch (error) {
@@ -81,4 +81,20 @@ const updatedCart = async (req, res) => {
   }
 };
 
-export { addToCart, getCartList, updatedCart };
+const RemoveFromCart = async (req, res) => {
+  const { userId, productId } = req.body;
+  console.log(req.body);
+  try {
+    const updatedCart = await cartModel.findOneAndUpdate(
+      { userId },
+      { $pull: { items: { productId } } },
+      { new: true }
+    );
+    if (!updatedCart) return res.status(404).json({ error: 'Cart not found' });
+    res.status(200).json(updatedCart);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+export { addToCart, getCartList, updatedCart, RemoveFromCart };
