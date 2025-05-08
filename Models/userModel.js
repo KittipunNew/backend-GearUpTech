@@ -15,6 +15,7 @@ const userSchema = new mongoose.Schema(
         addressType: { type: String, required: true },
         addressDetails: { type: String, required: true },
         postCode: { type: String, required: true },
+        isDefault: { type: Boolean, default: false },
       },
     ],
     dateOfBirth: { type: Date, required: true },

@@ -106,6 +106,11 @@ const createAddress = async (req, res) => {
       return res.status(400).json({ message: 'Invalid address data' });
     }
 
+    // ถ้า address ที่ส่งมามี isDefault = true → set address เดิมทั้งหมดให้ isDefault = false
+    if (address.isDefault) {
+      user.address.forEach((addr) => (addr.isDefault = false));
+    }
+
     user.address.push(address); // เพิ่มที่อยู่ใหม่เข้าไปใน array
     await user.save();
 
@@ -128,6 +133,7 @@ const updateUserAddress = async (req, res) => {
     addressType,
     addressDetails,
     postCode,
+    isDefault,
   } = req.body;
 
   try {
@@ -137,7 +143,7 @@ const updateUserAddress = async (req, res) => {
 
     const uid = req.user?.uid;
 
-    const user = await userModel.findOneAndUpdate({ uid });
+    const user = await userModel.findOne({ uid });
 
     if (!user) return res.status(404).json({ message: 'User not found' });
 
@@ -154,6 +160,14 @@ const updateUserAddress = async (req, res) => {
     address.addressType = addressType;
     address.addressDetails = addressDetails;
     address.postCode = postCode;
+
+    // ถ้า isDefault เป็น true ให้ reset อันอื่นก่อน
+    if (isDefault === true) {
+      user.address.forEach((addr) => {
+        addr.isDefault = false;
+      });
+      address.isDefault = true;
+    }
 
     await user.save();
 
