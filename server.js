@@ -6,6 +6,8 @@ import dotenv from 'dotenv';
 import connecntCloudinary from './Config/cloudinary.js';
 import productRouter from './Routes/productRoute.js';
 import userRouter from './Routes/userRoute.js';
+import wishlistRouter from './Routes/wishlistRoute.js';
+import cartRouter from './Routes/cartRoute.js';
 
 dotenv.config();
 
@@ -24,6 +26,10 @@ app.use(cors());
 app.use('/api', productRouter);
 
 app.use('/api', userRouter);
+
+app.use('/api', wishlistRouter);
+
+app.use('/api', cartRouter);
 
 // app.use('/', (req, res) => {
 //   res.send('API WORKING !!!');

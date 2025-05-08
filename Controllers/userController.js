@@ -35,7 +35,6 @@ const getUserById = async (req, res) => {
     if (!req.user || !req.user.uid) {
       return res.status(401).json({ message: 'Unauthorized' });
     }
-
     const uid = req.user?.uid;
 
     const user = await userModel.findOne({ uid });
