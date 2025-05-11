@@ -177,6 +177,44 @@ const updateUserAddress = async (req, res) => {
   }
 };
 
+const setDefaultAddress = async (req, res) => {
+  const { addressId } = req.params;
+
+  try {
+    if (!req.user || !req.user.uid) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
+
+    const uid = req.user?.uid;
+
+    const user = await userModel.findOne({ uid });
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    let found = false;
+
+    user.address.forEach((addr) => {
+      if (addr._id.toString() === addressId) {
+        addr.isDefault = true;
+        found = true;
+      } else {
+        addr.isDefault = false;
+      }
+    });
+
+    if (!found) {
+      return res
+        .status(404)
+        .json({ message: 'Address not found with that ID' });
+    }
+
+    await user.save();
+
+    res.json({ message: 'Default address updated successfully', user });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 // ลบที่อยู่ผู้ใช้
 const deleteUserAddress = async (req, res) => {
   const { addressId } = req.params;
@@ -222,5 +260,6 @@ export {
   updateUserInfo,
   createAddress,
   updateUserAddress,
+  setDefaultAddress,
   deleteUserAddress,
 };

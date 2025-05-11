@@ -55,6 +55,7 @@ const addToCart = async (req, res) => {
   }
 };
 
+// อัพเดทข้อมูลสินค้าในตะกร้า
 const updatedCart = async (req, res) => {
   const { userId } = req.params;
   const { productId, quantity } = req.body;
@@ -81,9 +82,9 @@ const updatedCart = async (req, res) => {
   }
 };
 
+// ลบสินค้าออกจากตะกร้า
 const RemoveFromCart = async (req, res) => {
   const { userId, productId } = req.body;
-  console.log(req.body);
   try {
     const updatedCart = await cartModel.findOneAndUpdate(
       { userId },
@@ -97,4 +98,25 @@ const RemoveFromCart = async (req, res) => {
   }
 };
 
-export { addToCart, getCartList, updatedCart, RemoveFromCart };
+// เคลียร์สินค้าในตะกร้าหลังกด place order
+const clearCart = async (req, res) => {
+  const { userId } = req.body;
+  try {
+    let cart = await cartModel.findOne({ userId });
+
+    if (!cart) {
+      return res.status(404).json({ msg: 'Cart not found' });
+    }
+
+    cart.items = [];
+
+    await cart.save();
+
+    res.json({ msg: 'Cart cleared successfully' });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server Error');
+  }
+};
+
+export { addToCart, getCartList, updatedCart, RemoveFromCart, clearCart };
