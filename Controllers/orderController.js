@@ -51,61 +51,38 @@ const createCODOrder = async (req, res) => {
 };
 
 const createStripeOrder = async (req, res) => {
-  const { userId } = req.params;
+  const { email } = req.user;
   const { cartList, address } = req.body;
 
+  console.log('cartList:', cartList);
+
+  if (!cartList || !Array.isArray(cartList)) {
+    return res.status(400).json({ error: 'Invalid cartList data.' });
+  }
+
   try {
-    const lineItems = cartList.map((item) => ({
-      price_data: {
-        currency: 'thb',
-        product_data: {
-          name: item.name,
-        },
-        unit_amount: item.price * 100,
-      },
-      quantity: item.quantity,
-    }));
-
-    // คำนวณยอดรวมทั้งหมด
-    const totalAmount = cartList.reduce(
-      (acc, item) => acc + item.price * item.quantity,
-      0
-    );
-
-    // สร้าง Stripe session
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
-      line_items: lineItems,
+      customer_email: email,
+      line_items: cartList.map((item) => ({
+        price_data: {
+          currency: 'thb',
+          product_data: {
+            name: item.productId?.name || 'Unknown Product',
+          },
+          unit_amount: Math.round(item.productId.price * 100),
+        },
+        quantity: Number(item.quantity || 1),
+      })),
       mode: 'payment',
       success_url: `${process.env.CLIENT_URL}/place-order-success`,
       cancel_url: `${process.env.CLIENT_URL}/cart`,
-      metadata: {
-        userId,
-        address: JSON.stringify(address),
-        cartList: JSON.stringify(cartList),
-        totalAmount,
-      },
     });
 
-    // บันทึก order ลง DB
-    const productsForDB = cartList.map((item) => ({
-      productId: item._id,
-      quantity: item.quantity,
-      price: item.price,
-    }));
-
-    await OrderModel.create({
-      userId,
-      products: productsForDB,
-      address,
-      totalAmount,
-      orderStatus: 'pending',
-    });
-
-    res.status(200).json({ sessionId: session.id });
-  } catch (err) {
-    console.error('Stripe error:', err);
-    res.status(500).json({ error: 'Stripe checkout session failed' });
+    res.json({ sessionId: session.id });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 };
 

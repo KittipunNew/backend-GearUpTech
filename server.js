@@ -9,6 +9,7 @@ import userRouter from './Routes/userRoute.js';
 import wishlistRouter from './Routes/wishlistRoute.js';
 import cartRouter from './Routes/cartRoute.js';
 import orderRouter from './Routes/orderRoute.js';
+import webhookRouter from './Routes/webhookRoute.js';
 
 dotenv.config();
 
@@ -34,6 +35,7 @@ app.use('/api', cartRouter);
 
 app.use('/api', orderRouter);
 
+app.use('/api', webhookRouter);
 // app.use('/', (req, res) => {
 //   res.send('API WORKING !!!');
 // });
