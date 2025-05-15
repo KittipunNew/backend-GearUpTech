@@ -24,6 +24,8 @@ app.use(morgan('dev'));
 
 app.use(cors());
 
+app.use('/api/stripe', webhookRouter);
+
 app.use(express.json());
 
 app.use('/api', productRouter);
@@ -35,8 +37,6 @@ app.use('/api', wishlistRouter);
 app.use('/api', cartRouter);
 
 app.use('/api', orderRouter);
-
-app.use('/api/stripe', webhookRouter);
 
 // app.use('/', (req, res) => {
 //   res.send('API WORKING !!!');
