@@ -33,6 +33,14 @@ const orderSchema = new mongoose.Schema(
       enum: ['pending', 'processing', 'shipped', 'delivered', 'cancelled'],
       default: 'pending',
     },
+    paymentStatus: {
+      type: String,
+      enum: ['unpaid', 'paid', 'refunded', 'failed'],
+      default: 'unpaid',
+    },
+    stripeSessionId: {
+      type: String,
+    },
     orderedAt: { type: Date, default: Date.now },
   },
   { timestamps: true }

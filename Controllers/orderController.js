@@ -52,15 +52,15 @@ const createCODOrder = async (req, res) => {
 
 const createStripeOrder = async (req, res) => {
   const { email } = req.user;
+  const { userId } = req.params;
   const { cartList, address } = req.body;
-
-  console.log('cartList:', cartList);
 
   if (!cartList || !Array.isArray(cartList)) {
     return res.status(400).json({ error: 'Invalid cartList data.' });
   }
 
   try {
+    // สร้าง Stripe session
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       customer_email: email,
@@ -79,9 +79,32 @@ const createStripeOrder = async (req, res) => {
       cancel_url: `${process.env.CLIENT_URL}/cart`,
     });
 
+    // คำนวณ totalAmount
+    const totalAmount = cartList.reduce((sum, item) => {
+      return sum + item.productId.price * item.quantity;
+    }, 0);
+
+    // เตรียมข้อมูล products ให้ตรง schema
+    const products = cartList.map((item) => ({
+      productId: item.productId._id || item.productId,
+      quantity: item.quantity,
+      price: item.productId.price,
+    }));
+
+    // สร้าง Order ใน MongoDB
+    await OrderModel.create({
+      userId,
+      products,
+      totalAmount,
+      address,
+      paymentStatus: 'unpaid',
+      orderStatus: 'pending',
+      stripeSessionId: session.id,
+    });
+
     res.json({ sessionId: session.id });
   } catch (error) {
-    console.error(error);
+    console.error('Create Stripe Order Error:', error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 };

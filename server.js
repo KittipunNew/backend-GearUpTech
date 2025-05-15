@@ -21,9 +21,10 @@ connectDB();
 connecntCloudinary();
 
 app.use(morgan('dev'));
-app.use(express.json());
 
 app.use(cors());
+
+app.use(express.json());
 
 app.use('/api', productRouter);
 
@@ -35,7 +36,8 @@ app.use('/api', cartRouter);
 
 app.use('/api', orderRouter);
 
-app.use('/api', webhookRouter);
+app.use('/api/stripe', webhookRouter);
+
 // app.use('/', (req, res) => {
 //   res.send('API WORKING !!!');
 // });
