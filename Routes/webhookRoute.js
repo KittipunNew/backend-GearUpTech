@@ -39,9 +39,6 @@ webhookRouter.post(
         }
       }
     }
-
-    console.log('✅ Webhook event received:', event.type);
-    console.log('Session ID from webhook:', session.id);
     // ตอบกลับ Stripe ว่าได้รับแล้ว
     res.json({ received: true });
   }

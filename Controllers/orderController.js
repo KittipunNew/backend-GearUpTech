@@ -2,11 +2,24 @@ import OrderModel from '../Models/orderModel.js';
 import userModel from '../Models/userModel.js';
 import Stripe from 'stripe';
 import dotenv from 'dotenv';
+import shortid from 'shortid';
 
 dotenv.config();
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
+const getOrder = async (req, res) => {
+  const { userId } = req.params;
+  try {
+    const order = await OrderModel.find({ userId });
+    res.status(200).json(order);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error fetching order' });
+  }
+};
+
+// จ่ายปลายทาง
 const createCODOrder = async (req, res) => {
   try {
     const { userId } = req.params;
@@ -50,6 +63,7 @@ const createCODOrder = async (req, res) => {
   }
 };
 
+// จ่ายผ่าน stripe
 const createStripeOrder = async (req, res) => {
   const { email } = req.user;
   const { userId } = req.params;
@@ -60,6 +74,15 @@ const createStripeOrder = async (req, res) => {
   }
 
   try {
+    // สร้าง short order ID
+    const timestamp = Date.now().toString().slice(-6);
+    const numericPart = shortid
+      .generate()
+      .replace(/\D/g, '')
+      .padStart(2, '0')
+      .slice(0, 2);
+    const shortOrderId = `ORD-${timestamp}${numericPart}`;
+
     // สร้าง Stripe session
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
@@ -69,6 +92,9 @@ const createStripeOrder = async (req, res) => {
           currency: 'thb',
           product_data: {
             name: item.productId?.name || 'Unknown Product',
+            metadata: {
+              orderId: shortOrderId,
+            },
           },
           unit_amount: Math.round(item.productId.price * 100),
         },
@@ -77,6 +103,9 @@ const createStripeOrder = async (req, res) => {
       mode: 'payment',
       success_url: `${process.env.CLIENT_URL}/place-order-success`,
       cancel_url: `${process.env.CLIENT_URL}/cart`,
+      metadata: {
+        shortOrderId, // บันทึก short ID ใน session
+      },
     });
 
     // คำนวณ totalAmount
@@ -100,13 +129,14 @@ const createStripeOrder = async (req, res) => {
       paymentStatus: 'unpaid',
       orderStatus: 'pending',
       stripeSessionId: session.id,
+      shortOrderId,
     });
 
-    res.json({ sessionId: session.id });
+    res.json({ sessionId: session.id, shortOrderId });
   } catch (error) {
     console.error('Create Stripe Order Error:', error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 };
 
-export { createCODOrder, createStripeOrder };
+export { createCODOrder, createStripeOrder, getOrder };

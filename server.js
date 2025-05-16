@@ -22,6 +22,30 @@ connecntCloudinary();
 
 app.use(morgan('dev'));
 
+// Define the list of allowed origins
+const allowedOrigins = [
+  //   'https://artnakkk-frontend-admin.vercel.app', // For admin app
+  //   'https://artnakkk-frontend-user.vercel.app', // For user app
+  'http://localhost:5173', // For local development
+];
+
+// Configure CORS
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // Allow requests with no origin (e.g., mobile apps or curl)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) {
+        callback(null, true); // Allow the origin
+      } else {
+        callback(new Error('Not allowed by CORS')); // Block the origin
+      }
+    },
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    credentials: true, // Allow cookies or Authorization headers
+  })
+);
+
 app.use(cors());
 
 app.use('/api/stripe', webhookRouter);

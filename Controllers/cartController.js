@@ -3,7 +3,6 @@ import cartModel from './../Models/cartModel.js';
 // ดึงรายการสินค้าในตะกร้า
 const getCartList = async (req, res) => {
   const { userId } = req.params;
-  console.log(req.params);
   try {
     const cartList = await cartModel
       .findOne({ userId })

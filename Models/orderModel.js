@@ -41,6 +41,7 @@ const orderSchema = new mongoose.Schema(
     stripeSessionId: {
       type: String,
     },
+    shortOrderId: { type: String, unique: true },
     orderedAt: { type: Date, default: Date.now },
   },
   { timestamps: true }
