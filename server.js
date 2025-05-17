@@ -25,9 +25,9 @@ app.use(morgan('dev'));
 // Define the list of allowed origins
 const allowedOrigins = [
   'http://localhost:5173',
-  'https://gearuptech.vercel.app/',
-  'https://gearuptech-git-main-kittipuns-projects.vercel.app/',
-  'https://gearuptech-qxijilfxi-kittipuns-projects.vercel.app/',
+  'https://gearuptech.vercel.app',
+  'https://gearuptech-git-main-kittipuns-projects.vercel.app',
+  'https://gearuptech-qxijilfxi-kittipuns-projects.vercel.app',
 ];
 
 // Configure CORS
