@@ -11,11 +11,62 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 const getOrder = async (req, res) => {
   const { userId } = req.params;
   try {
-    const order = await OrderModel.find({ userId });
+    const order = await OrderModel.find({ userId }).populate(
+      'products.productId',
+      'price images name'
+    );
     res.status(200).json(order);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Error fetching order' });
+  }
+};
+
+const adminGetOrder = async (req, res) => {
+  try {
+    const order = await OrderModel.find({}).populate(
+      'products.productId',
+      'price images name'
+    );
+    res.status(200).json(order);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error fetching order' });
+  }
+};
+
+const updateOrderStatus = async (req, res) => {
+  const { id } = req.params;
+  const { orderStatus } = req.body;
+
+  const validStatuses = [
+    'pending',
+    'processing',
+    'shipped',
+    'delivered',
+    'cancelled',
+  ];
+
+  if (!validStatuses.includes(orderStatus)) {
+    return res.status(400).json({ message: 'Invalid status value.' });
+  }
+
+  try {
+    const updatedOrder = await OrderModel.findByIdAndUpdate(
+      id,
+      { orderStatus },
+      { new: true }
+    );
+
+    if (!updatedOrder) {
+      return res.status(404).json({ message: 'Order not found.' });
+    }
+
+    res
+      .status(200)
+      .json({ message: 'Order status updated.', order: updatedOrder });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error.', error: error.message });
   }
 };
 
@@ -44,12 +95,23 @@ const createCODOrder = async (req, res) => {
       0
     );
 
+    // สร้าง short order ID
+    const timestamp = Date.now().toString().slice(-4);
+    const numericPart = shortid
+      .generate()
+      .replace(/\D/g, '')
+      .padStart(2, '0')
+      .slice(0, 2);
+    const shortOrderId = `ORD-${timestamp}${numericPart}`;
+
     const newOrder = new OrderModel({
       userId,
       products,
       totalAmount,
       address,
       orderStatus: 'pending', // default
+      paymentStatus: 'COD',
+      shortOrderId,
     });
 
     await newOrder.save();
@@ -75,7 +137,7 @@ const createStripeOrder = async (req, res) => {
 
   try {
     // สร้าง short order ID
-    const timestamp = Date.now().toString().slice(-6);
+    const timestamp = Date.now().toString().slice(-4);
     const numericPart = shortid
       .generate()
       .replace(/\D/g, '')
@@ -101,7 +163,7 @@ const createStripeOrder = async (req, res) => {
         quantity: Number(item.quantity || 1),
       })),
       mode: 'payment',
-      success_url: `${process.env.CLIENT_URL}/place-order-success`,
+      success_url: `${process.env.CLIENT_URL}/payment-success`,
       cancel_url: `${process.env.CLIENT_URL}/cart`,
       metadata: {
         shortOrderId, // บันทึก short ID ใน session
@@ -139,4 +201,10 @@ const createStripeOrder = async (req, res) => {
   }
 };
 
-export { createCODOrder, createStripeOrder, getOrder };
+export {
+  createCODOrder,
+  createStripeOrder,
+  getOrder,
+  adminGetOrder,
+  updateOrderStatus,
+};

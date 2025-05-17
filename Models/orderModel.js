@@ -35,7 +35,7 @@ const orderSchema = new mongoose.Schema(
     },
     paymentStatus: {
       type: String,
-      enum: ['unpaid', 'paid', 'refunded', 'failed'],
+      enum: ['unpaid', 'paid', 'COD', 'refunded', 'failed'],
       default: 'unpaid',
     },
     stripeSessionId: {

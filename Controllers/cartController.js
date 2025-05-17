@@ -6,7 +6,7 @@ const getCartList = async (req, res) => {
   try {
     const cartList = await cartModel
       .findOne({ userId })
-      .populate('items.productId', 'name price images');
+      .populate('items.productId', 'productId price images');
     res.status(200).json(cartList);
   } catch (error) {
     console.error(error);
