@@ -25,7 +25,7 @@ app.use(morgan('dev'));
 // Define the list of allowed origins
 const allowedOrigins = [
   //   'https://artnakkk-frontend-admin.vercel.app', // For admin app
-  //   'https://artnakkk-frontend-user.vercel.app', // For user app
+  'https://gearuptech.vercel.app/', // For user app
   'http://localhost:5173', // For local development
 ];
 
