@@ -34,12 +34,14 @@ const allowedOrigins = [
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Allow requests with no origin (e.g., mobile apps or curl)
+      console.log('🌐 Incoming Origin:', origin); // ✅ log ชื่อ origin ที่ถูก browser ส่งมา
+
       if (!origin) return callback(null, true);
       if (allowedOrigins.includes(origin)) {
-        callback(null, true); // Allow the origin
+        callback(null, true);
       } else {
-        callback(new Error('Not allowed by CORS')); // Block the origin
+        console.log('❌ Origin not allowed by CORS:', origin);
+        callback(new Error('Not allowed by CORS'));
       }
     },
     methods: ['GET,POST,PUT,PATCH,DELETE,OPTIONS'],
