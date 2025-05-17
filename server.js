@@ -47,8 +47,6 @@ app.use(
   })
 );
 
-app.use(cors());
-
 app.use('/api/stripe', webhookRouter);
 
 app.use(express.json());
