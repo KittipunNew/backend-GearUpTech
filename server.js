@@ -25,6 +25,7 @@ app.use(morgan('dev'));
 // Define the list of allowed origins
 const allowedOrigins = [
   'http://localhost:5173',
+  'http://localhost:5174',
   'https://gearuptech.vercel.app',
   'https://gearuptech-git-main-kittipuns-projects.vercel.app',
   'https://gearuptech-qxijilfxi-kittipuns-projects.vercel.app',
@@ -34,8 +35,6 @@ const allowedOrigins = [
 app.use(
   cors({
     origin: (origin, callback) => {
-      console.log('🌐 Incoming Origin:', origin); // ✅ log ชื่อ origin ที่ถูก browser ส่งมา
-
       if (!origin) return callback(null, true);
       if (allowedOrigins.includes(origin)) {
         callback(null, true);
