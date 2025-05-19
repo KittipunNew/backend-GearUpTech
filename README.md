@@ -9,11 +9,11 @@ Back-end API สำหรับเว็บไซต์ E-commerce GearUp Tech �
 - Multer / Cloudinary (สำหรับอัปโหลดภาพสินค้า)
 
 ## 🔄 API
-👤 Users API
+### 👤 Users API
 - `GET /api/users` – ดึงข้อมูลผู้ใช้ (ต้องเข้าสู่ระบบ)
 - `POST /api/register` – สมัครสมาชิกใหม่
 - `PUT /api/update-info` – อัปเดตข้อมูลผู้ใช้ (ชื่อ, เบอร์โทร ฯลฯ)
-🏠 Address API
+### 🏠 Address API
 - `POST /api/create-address` – เพิ่มที่อยู่ใหม่
 - `PUT /api/update-address/:addressId` – แก้ไขที่อยู่ที่มีอยู่
 - `PUT /api/set-default-address/:addressId` – ตั้งค่าที่อยู่นี้เป็นค่าหลัก
