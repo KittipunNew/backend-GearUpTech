@@ -10,6 +10,7 @@ import wishlistRouter from './Routes/wishlistRoute.js';
 import cartRouter from './Routes/cartRoute.js';
 import orderRouter from './Routes/orderRoute.js';
 import webhookRouter from './Routes/webhookRoute.js';
+import setupSwagger from './swagger.js';
 
 dotenv.config();
 
@@ -26,6 +27,8 @@ app.use(morgan('dev'));
 const allowedOrigins = [
   'http://localhost:5173', // For local development
   'http://localhost:5174', // For local development
+  'http://localhost:5000',
+  'https://backend-gearuptech.onrender.com',
   'https://frontend-admin-gearuptech.vercel.app', // For admin app
   'https://gearuptech.vercel.app', // For user app
   'https://gearuptech-git-main-kittipuns-projects.vercel.app', // For user app
@@ -62,6 +65,8 @@ app.use('/api', wishlistRouter);
 app.use('/api', cartRouter);
 
 app.use('/api', orderRouter);
+
+setupSwagger(app);
 
 // app.use('/', (req, res) => {
 //   res.send('API WORKING !!!');

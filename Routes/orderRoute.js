@@ -5,6 +5,7 @@ import {
   getOrder,
   adminGetOrder,
   updateOrderStatus,
+  getStripeSessionInfo,
 } from '../Controllers/orderController.js';
 import { verifyFirebaseToken } from '../Middleware/firebaseAdmin.js';
 
@@ -13,6 +14,12 @@ const orderRouter = express.Router();
 orderRouter.get('/order/:userId', verifyFirebaseToken, getOrder);
 
 orderRouter.get('/order', verifyFirebaseToken, adminGetOrder);
+
+orderRouter.get(
+  '/session/:sessionId',
+  verifyFirebaseToken,
+  getStripeSessionInfo
+);
 
 orderRouter.post(
   '/create-cod-order/:userId',

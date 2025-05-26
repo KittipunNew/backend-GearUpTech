@@ -1,0 +1,627 @@
+openapi: 3.0.0
+info:
+  title: GearUp Tech E-Commerce API
+  version: 1.0.0
+  description: RESTful API สำหรับระบบ E-Commerce
+
+servers:
+  - url: https://backend-gearuptech.onrender.com/api
+
+tags:
+  - name: Auth
+  - name: Product
+  - name: Cart
+  - name: Wishlist
+  - name: Order
+  - name: User
+  - name: Upload
+
+paths:
+  /register:
+    post:
+      tags: [Auth]
+      summary: สมัครสมาชิก
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - uid
+                - email
+                - firstName
+                - lastName
+                - phoneNumber
+                - dateOfBirth
+              properties:
+                uid:
+                  type: string
+                email:
+                  type: string
+                firstName:
+                  type: string
+                lastName:
+                  type: string
+                phoneNumber:
+                  type: string
+                dateOfBirth:
+                  type: string
+                  format: date
+      responses:
+        '201':
+          description: สมัครสมาชิกสำเร็จ
+        '400':
+          description: ข้อมูลไม่ถูกต้อง
+
+  /users:
+    get:
+      tags: [User]
+      summary: ดึงข้อมูลผู้ใช้
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: ข้อมูลผู้ใช้
+
+  /update-info:
+    put:
+      tags: [User]
+      summary: อัปเดตข้อมูลผู้ใช้
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - firstName
+                - lastName
+                - phoneNumber
+                - dateOfBirth
+              properties:
+                firstName:
+                  type: string
+                lastName:
+                  type: string
+                phoneNumber:
+                  type: string
+                dateOfBirth:
+                  type: string
+                  format: date
+      responses:
+        '200':
+          description: อัปเดตสำเร็จ
+
+  /product:
+    get:
+      tags: [Product]
+      summary: ดึงสินค้าทั้งหมด
+      responses:
+        '200':
+          description: รายการสินค้า
+
+    post:
+      tags: [Product]
+      summary: เพิ่มสินค้าใหม่
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - name
+                - price
+                - description
+                - category
+              properties:
+                name:
+                  type: string
+                price:
+                  type: number
+                description:
+                  type: string
+                category:
+                  type: string
+                bestseller:
+                  type: boolean
+                image1:
+                  type: string
+                  format: binary
+                image2:
+                  type: string
+                  format: binary
+                image3:
+                  type: string
+                  format: binary
+                image4:
+                  type: string
+                  format: binary
+      responses:
+        '201':
+          description: เพิ่มสินค้าสำเร็จ
+
+  /product/{_id}/updateproduct:
+    put:
+      tags: [Product]
+      summary: อัปเดตข้อมูลสินค้า (admin)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: _id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                price:
+                  type: number
+                description:
+                  type: string
+                category:
+                  type: string
+      responses:
+        '200':
+          description: อัปเดตสินค้าสำเร็จ
+
+  /product/{_id}:
+    delete:
+      tags: [Product]
+      summary: ลบสินค้า (admin)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: _id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ลบสินค้าสำเร็จ
+
+  /product/{_id}/bestseller:
+    put:
+      tags: [Product]
+      summary: เพิ่มสินค้าเป็น Bestseller (admin)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: _id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                bestseller:
+                  type: boolean
+      responses:
+        '200':
+          description: อัปเดตสถานะ Bestseller สำเร็จ
+    delete:
+      tags: [Product]
+      summary: ลบสินค้าออกจาก Bestseller (admin)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: _id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ลบสถานะ Bestseller สำเร็จ
+
+  /cart/{userId}:
+    get:
+      tags: [Cart]
+      summary: ดูตะกร้าสินค้าของผู้ใช้
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ตะกร้าสินค้า
+
+  /add-cart:
+    post:
+      tags: [Cart]
+      summary: เพิ่มสินค้าลงตะกร้า
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - userId
+                - productId
+                - quantity
+              properties:
+                userId:
+                  type: string
+                productId:
+                  type: string
+                quantity:
+                  type: integer
+      responses:
+        '201':
+          description: เพิ่มสินค้าสำเร็จ
+
+  /update-cart/{userId}:
+    put:
+      tags: [Cart]
+      summary: อัปเดตจำนวนสินค้าในตะกร้า
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - productId
+                - quantity
+              properties:
+                productId:
+                  type: string
+                quantity:
+                  type: integer
+      responses:
+        '200':
+          description: อัปเดตจำนวนสินค้าสำเร็จ
+
+  /delete-cart:
+    delete:
+      tags: [Cart]
+      summary: ลบสินค้าออกจากตะกร้า
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - userId
+                - productId
+              properties:
+                userId:
+                  type: string
+                productId:
+                  type: string
+      responses:
+        '200':
+          description: ลบสินค้าออกจากตะกร้าสำเร็จ
+
+  /clear-cart:
+    delete:
+      tags: [Cart]
+      summary: ล้างตะกร้าทั้งหมดของผู้ใช้
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - userId
+              properties:
+                userId:
+                  type: string
+      responses:
+        '200':
+          description: ล้างตะกร้าสำเร็จ
+
+  /wishlist/{userId}:
+    get:
+      tags: [Wishlist]
+      summary: ดู Wishlist ของผู้ใช้
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: รายการ Wishlist
+
+  /add-wishlist:
+    post:
+      tags: [Wishlist]
+      summary: เพิ่มสินค้าใน Wishlist
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - userId
+                - productId
+              properties:
+                userId:
+                  type: string
+                productId:
+                  type: string
+      responses:
+        '201':
+          description: เพิ่ม Wishlist สำเร็จ
+
+  /delete-wishlist:
+    delete:
+      tags: [Wishlist]
+      summary: ลบสินค้าออกจาก Wishlist
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - userId
+                - productId
+              properties:
+                userId:
+                  type: string
+                productId:
+                  type: string
+      responses:
+        '200':
+          description: ลบ Wishlist สำเร็จ
+
+  /order/{userId}:
+    get:
+      tags: [Order]
+      summary: ดูออเดอร์ของผู้ใช้
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: รายการออเดอร์
+
+  /order:
+    get:
+      tags: [Order]
+      summary: ดึงรายการออเดอร์ทั้งหมด (admin)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: รายการออเดอร์ทั้งหมด
+
+  /order/{id}/status:
+    patch:
+      tags: [Order]
+      summary: อัปเดตสถานะคำสั่งซื้อ (admin)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - orderStatus
+              properties:
+                orderStatus:
+                  type: string
+                  enum: [pending, processing, shipped, delivered, cancelled]
+      responses:
+        '200':
+          description: อัปเดตสถานะออเดอร์สำเร็จ
+
+  /create-cod-order/{userId}:
+    post:
+      tags: [Order]
+      summary: สร้างออเดอร์แบบ COD
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - cartList
+                - address
+              properties:
+                cartList:
+                  type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          productId:
+                            type: object
+                            properties:
+                              _id:
+                                type: string
+                              price:
+                                type: number
+                          quantity:
+                            type: integer
+                address:
+                  type: object
+                  properties:
+                    firstName:
+                      type: string
+                    lastName:
+                      type: string
+                    phoneNumber:
+                      type: string
+                    addressType:
+                      type: string
+                    addressDetails:
+                      type: string
+                    postCode:
+                      type: string
+      responses:
+        '201':
+          description: สร้างออเดอร์สำเร็จ
+
+  /create-checkout-session/{userId}:
+    post:
+      tags: [Order]
+      summary: สร้างออเดอร์ผ่าน Stripe Checkout
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - cartList
+                - address
+              properties:
+                cartList:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      productId:
+                        type: object
+                        properties:
+                          _id:
+                            type: string
+                          price:
+                            type: number
+                          name:
+                            type: string
+                      quantity:
+                        type: integer
+                address:
+                  type: object
+                  properties:
+                    firstName:
+                      type: string
+                    lastName:
+                      type: string
+                    phoneNumber:
+                      type: string
+                    addressType:
+                      type: string
+                    addressDetails:
+                      type: string
+                    postCode:
+                      type: string
+      responses:
+        '200':
+          description: สร้าง Stripe session สำเร็จ
+
+  /session/{sessionId}:
+    get:
+      tags: [Order]
+      summary: ดึงข้อมูล Stripe session
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: sessionId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ข้อมูล Stripe session
+
+  /upload:
+    post:
+      tags: [Upload]
+      summary: อัปโหลดรูปภาพสินค้า
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                image:
+                  type: string
+                  format: binary
+      responses:
+        '201':
+          description: อัปโหลดรูปภาพสำเร็จ
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: https
+      scheme: bearer
+      bearerFormat: JWT

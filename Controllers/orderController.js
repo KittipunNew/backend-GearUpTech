@@ -163,7 +163,7 @@ const createStripeOrder = async (req, res) => {
         quantity: Number(item.quantity || 1),
       })),
       mode: 'payment',
-      success_url: `${process.env.CLIENT_URL}/payment-success`,
+      success_url: `${process.env.CLIENT_URL}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.CLIENT_URL}/cart`,
       metadata: {
         shortOrderId, // บันทึก short ID ใน session
@@ -201,10 +201,35 @@ const createStripeOrder = async (req, res) => {
   }
 };
 
+const getStripeSessionInfo = async (req, res) => {
+  try {
+    const { sessionId } = req.params;
+    console.log('🪪 sessionId:', sessionId); // ✅ เช็กตรงนี้ก่อน
+
+    // ดึง order จาก MongoDB ที่สร้างไว้ก่อนหน้านี้
+    const order = await OrderModel.findOne({ stripeSessionId: sessionId });
+    console.log('📦 order found:', order); // ✅ เช็กว่าหาเจอหรือไม่
+
+    if (!order) {
+      return res.status(404).json({ error: 'Order not found' });
+    }
+
+    res.status(200).json({
+      shortOrderId: order.shortOrderId,
+      totalAmount: order.totalAmount,
+      createdAt: order.createdAt,
+    });
+  } catch (error) {
+    console.error('Error fetching order by session ID:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
 export {
   createCODOrder,
   createStripeOrder,
   getOrder,
   adminGetOrder,
   updateOrderStatus,
+  getStripeSessionInfo,
 };
