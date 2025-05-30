@@ -14,6 +14,36 @@ Back-end API สำหรับเว็บไซต์ E-commerce GearUp Tech �
 
 - [Swagger UI (API Docs)](https://backend-gearuptech.onrender.com/api-docs/)
 
+### **How to Use Token with Swagger UI**
+
+To test protected routes using **Swagger UI**, you need to log in using Firebase Authentication first and retrieve your **JWT token** (ID token) to use as a **Bearer Token**.
+
+**Admin Test Account**
+
+If you're testing the API as an **admin**, you can use the following test credentials:
+
+- **Email:** test@email.com
+- **Password:** testadmin1234
+
+> ⚠️ Admin sign-up is disabled on the website. Please use the above credentials to log in.
+
+### Steps to Get Your Firebase Token
+
+1. **Sign Up / Log In** on the website or your front-end app.
+   - Use the **admin test account** (see above) if you want to test admin routes.
+   - Or register a new account normally for client access.
+2. Open the browser’s **DevTools Console** (e.g., right-click → Inspect → Console).
+3. Run this JavaScript snippet to retrieve the token
+4. **Copy the token** printed in the console.
+5. Go to [Swagger UI](https://backend-gearuptech.onrender.com/api-docs/)
+6. Click on **Authorize 🔒** at the top right.
+7. Paste the token in this format: Bearer YOUR_TOKEN_HERE
+8. Now you’re ready to test authenticated endpoints like:
+
+- Add product (admin only)
+- Create orders
+- Manage user profile, etc.
+
 ## 🔄 API
 
 ### 👤 Users API
